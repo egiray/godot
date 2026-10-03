@@ -3202,6 +3202,11 @@
 		<member name="rendering/lights_and_shadows/directional_shadow/soft_shadow_filter_quality.mobile" type="int" setter="" getter="" default="0">
 			Lower-end override for [member rendering/lights_and_shadows/directional_shadow/soft_shadow_filter_quality] on mobile devices, due to performance concerns or driver support.
 		</member>
+		<member name="rendering/lights_and_shadows/directional_shadow/vertex_coordinates" type="bool" setter="" getter="" default="false">
+			If [code]true[/code], the shadow map coordinate of the first [DirectionalLight3D] is computed per vertex and interpolated, instead of per pixel, when that light uses [constant DirectionalLight3D.SHADOW_ORTHOGONAL] mode. Pixels beyond [member DirectionalLight3D.directional_shadow_max_distance] also skip the shadow map lookup entirely. This reduces the cost of directional shadows on mobile GPUs, where the per-pixel shadow coordinate is a significant part of the fragment shader.
+			The normal bias is then also computed from the vertex normals, so shadows on large, smoothly curved surfaces can differ slightly from the per-pixel result. Skinned meshes, double-sided materials and shaders that write [code]LIGHT_VERTEX[/code] always use the per-pixel path. This setting has no effect in other directional shadow modes.
+			[b]Note:[/b] This setting is only supported when using the Mobile renderer.
+		</member>
 		<member name="rendering/lights_and_shadows/multi_bounce_occlusion/enabled" type="bool" setter="" getter="" default="false">
 			If [code]true[/code], approximates local multi-bounce global illumination in ambient occlusion by integrating albedo information.
 			[b]Note:[/b] Multi-bounce occlusion is only supported in the Forward+ rendering method.

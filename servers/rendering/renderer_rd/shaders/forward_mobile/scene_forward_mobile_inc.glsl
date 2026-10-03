@@ -233,6 +233,12 @@ bool sc_material_feedback() {
 	return ((sc_packed_2() >> 1) & 1U) != 0;
 }
 
+// The first directional light's shadow has a single split, so its shadow map coordinate
+// is computed in the vertex shader (see `directional_shadow_coord_interp`).
+bool sc_directional_shadow_vertex_coord() {
+	return ((sc_packed_2() >> 2) & 1U) != 0;
+}
+
 layout(constant_id = 3) const bool sc_emulate_point_size = false;
 
 #ifdef POINT_SIZE_USED

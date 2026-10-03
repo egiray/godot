@@ -1191,6 +1191,7 @@ void RenderForwardMobile::_render_scene(RenderDataRD *p_render_data, const Color
 		base_specialization.use_directional_soft_shadows = p_render_data->directional_light_count > 0 ? p_render_data->directional_light_soft_shadows : false;
 		base_specialization.directional_lights = SceneShaderForwardMobile::shader_count_for(p_render_data->directional_light_count);
 		base_specialization.directional_light_blend_splits = light_storage->get_directional_light_blend_splits(p_render_data->directional_light_count);
+		base_specialization.directional_shadow_vertex_coord = use_directional_shadow_vertex_coord && light_storage->is_first_directional_shadow_single_split(p_render_data->directional_light_count);
 
 		if (!is_environment(p_render_data->environment) || !environment_get_fog_enabled(p_render_data->environment)) {
 			base_specialization.disable_fog = true;
@@ -2528,6 +2529,10 @@ void RenderForwardMobile::_render_list_template(RenderingDevice::DrawListID p_dr
 			pipeline_specialization.reflection_probes = SceneShaderForwardMobile::shader_count_for(inst->reflection_probe_count);
 			pipeline_specialization.decals = inst->decals_count > 0;
 			pipeline_specialization.use_lightmap_specular = element_info.uses_lightmap_specular;
+			if (pipeline_specialization.directional_shadow_vertex_coord && inst->data->skeleton.is_valid()) {
+				// Skinned meshes (usually characters with smooth normals, seen up close) keep the per-pixel normal bias.
+				pipeline_specialization.directional_shadow_vertex_coord = false;
+			}
 
 #ifdef DEBUG_ENABLED
 			if (unlikely(get_debug_draw_mode() == RSE::VIEWPORT_DEBUG_DRAW_LIGHTING)) {
@@ -3623,6 +3628,8 @@ RenderForwardMobile::RenderForwardMobile() {
 	if (force_vertex_shading) {
 		defines += "\n#define USE_VERTEX_LIGHTING\n";
 	}
+
+	use_directional_shadow_vertex_coord = GLOBAL_GET("rendering/lights_and_shadows/directional_shadow/vertex_coordinates");
 
 	bool specular_occlusion = GLOBAL_GET("rendering/reflections/specular_occlusion/enabled");
 	if (!specular_occlusion) {

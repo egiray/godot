@@ -849,6 +849,12 @@ public:
 
 		return blend_splits;
 	}
+	// True if the first directional light casts shadows in Orthogonal mode (one split). Its shadow map coordinate
+	// is then an affine function of the position, which the Mobile renderer can compute per vertex.
+	bool is_first_directional_shadow_single_split(const uint32_t p_directional_light_count) const {
+		// In Orthogonal mode, only the first split offset is set; the others are 0.
+		return p_directional_light_count > 0 && directional_lights[0].shadow_opacity > 0.001 && directional_lights[0].shadow_split_offsets[1] == 0.0f;
+	}
 	bool has_directional_shadows(const uint32_t p_directional_light_count) {
 		for (uint32_t i = 0; i < p_directional_light_count; i++) {
 			if (directional_lights[i].shadow_opacity > 0.001) {
